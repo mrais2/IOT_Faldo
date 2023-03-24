@@ -1,0 +1,311 @@
+<!Doctype HTML>heart,index
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" href="style-main-page.css" type="text/css"/>
+</head>
+<body>
+	<div id="mySidenav" class="sidenav">
+	<p class="logo"><span>Heart</span>Sensor</p>
+  <a href="#" class="icon-a" style="display: flex;justify-content: center; align-items: center;"><img class="logo-image" src="icon/icons-dash.png" style="height: 30px;width: 30px;"></i> &nbsp;&nbsp;Dashboard</a>
+
+  </div>
+  <div id="main">
+  <div class="head">
+  <div class="col-div-6">
+    <span style="font-size:30px;cursor:pointer; color: white;" class="nav"  >&#9776; Dashboard</span>
+    <span style="font-size:30px;cursor:pointer; color: white;" class="nav2"  >&#9776; Dashboard</span>
+  </div>
+  <div class="col-div-6">
+  <div class="profile">
+    <img src="icon/heart main.png" class="pro-img" />
+	  <p>Faldo Bigdjaa Limas <span>  </span></p>
+  </div>
+  <div class="col-div-5">
+  <p id="status-mqtt">MQTT DISCONNECT</p>
+  </div>
+  </div>
+	<div class="clearfix"></div>
+  </div>
+	<div class="clearfix"></div>
+	<br/>
+
+	<div class="clearfix"></div>
+	  <br/><br/>
+	<div class="col-div-8">
+	<div class="box-8">
+	<div class="content-box">
+			<p>Portable Medical Devices </p>
+			<br/>
+			<table>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+      <style>
+        .chart-container1 
+        {
+        width: 100%;
+        padding-top: 0%;
+        float: left;
+        }
+        .chart-container2 
+        {                
+        width: 100%;
+        float: left;
+        }
+        
+        #myChart1, #myChart2 
+        {
+        border-top: 200px; 
+        }
+    
+        hr 
+        {
+        border: none;
+        border-top: 2px;
+        margin: 20px;
+        }
+      </style>
+
+  <div class="chart-container1">
+    <canvas id="myChart1"></canvas> 
+            
+  </div>
+  <div class="chart-container2">
+    <canvas id="myChart2"></canvas>
+  </div>
+        <hr>
+        <script src="js/mqttws31.min.js" type="text/javascript"></script>
+        <script>
+            const chart = new Chart(document.getElementById("myChart1"),
+            {
+              type: 'line',
+              tension: 0.4,
+              responsive:true,
+              maintainAspectRatio: false,
+              data: 
+              {
+              labels: [],
+              datasets: [{
+              label: 'Dataset 1',
+              data: [],
+              borderColor: 'blue',
+              yAxisID: 'y-axis-1',
+              type: 'line',
+              tension: 0.4,
+              fill: false
+            },
+            {
+              label: 'Dataset 2',
+              data: [],
+              borderColor: 'red',
+              yAxisID: 'y-axis-2',
+              type: 'line',
+              tension: 0.4,
+              fill: false
+            }]
+            },
+              options: 
+            {
+              responsive: true,
+              animation: false,
+              scales: {
+              xAxes: 
+              [{
+              display: true,
+              scaleLabel: 
+            {
+              display: true,
+              labelString: 'Time'
+            }
+              }],   
+              yAxes: 
+              [{
+              id: 'y-axis-1',
+              display: true,
+              position: 'left',
+              scaleLabel: 
+            {
+              display: true,
+              labelString: 'Value 1'
+            },
+              ticks: 
+            {
+              suggestedMin: 0,
+              suggestedMax: 100
+            }
+              }, 
+                        
+              {
+              id: 'y-axis-2',
+              display: true,
+              position: 'right',
+              scaleLabel: 
+            {
+              display: true,
+              labelString: 'Value 2'
+            },
+              ticks: 
+            {
+              suggestedMin: 0,
+              suggestedMax: 100
+            }
+              }]
+            }}
+            });
+          function updateChart(value1,value2) 
+          {
+                 
+              // Add the new values to the chart
+                chart.data.datasets[0].data.push(value1);
+                chart.data.datasets[1].data.push(value2);
+                  
+              // Add a label with the current time to the chart
+            const now = new Date();
+            const timeLabel = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
+                chart.data.labels.push(timeLabel);
+                  
+              // Remove old data points from the chart if there are too many
+              if (chart.data.labels.length > 10) 
+              {
+                  chart.data.labels.shift();
+                  chart.data.datasets[0].data.shift();
+                  chart.data.datasets[1].data.shift();
+              }
+                  
+              // Update the chart
+                  chart.update();
+              // Call this function again after a delay
+              // setTimeout(updateChart, 50);
+          }
+                  
+              // Call the updateChart function to start the chart updates
+              // Set up the MQTT client
+              let nameID = (Math.random() + 1).toString(36).substring(7);
+
+            const client = new Paho.MQTT.Client("192.168.0.51", 8083, `WebServer-${nameID}`);
+              // document.getElementById("status-mqtt").innerHTML = "MQTT TEST"
+              // Set up the callback functions
+                  client.onConnectionLost = onConnectionLost;
+                  client.onMessageArrived = onMessageArrived;
+
+              // Connect to the MQTT broker
+                  client.connect
+                  ({
+                    onSuccess: onConnect,
+                    onFailure: onFailure,
+                    useSSL: false,
+                  });
+
+          function onConnect() 
+              {
+              // alert("Connected to MQTT broker");
+
+              // Subscribe to the "share-data" topic
+                  client.subscribe("share-data");
+
+              // Update the data container to show that the client is connected
+              // const dataContainer = document.querySelector("#data-container");
+                  document.getElementById("status-mqtt").innerHTML = "MQTT CONNECTED"
+                  $('.col-div-5').css('background','green')
+                  alert("Connected to MQTT broker and subscribed to 'share-data' topic")
+              // dataContainer.innerHTML = "<p>Connected to MQTT broker and subscribed to 'share-data' topic</p>";
+              }
+              // Function to handle a failed connection
+        function onFailure(error) 
+              {
+              document.getElementById("status-mqtt").innerHTML = "MQTT ERROR"
+              $('.col-div-5').css('background','red')
+              alert("Failed to connect to MQTT broker:", error);
+              }
+              // Function to handle a lost connection
+        function onConnectionLost(responseObject) 
+              {
+              if (responseObject.errorCode !== 0) 
+              {
+                  document.getElementById("status-mqtt").innerHTML = "MQTT RECONNECT"
+                  $('.col-div-5').css('background','red')
+                  alert("Connection lost:", responseObject.errorMessage);
+                  setTimeout(reconnect,5000);
+                  console.log("reconnect");
+              }
+              }
+
+              // Function to handle incoming messages from the MQTT broker
+          function onMessageArrived(message) 
+          {
+            const dataContainer = document.querySelector("#data-container");
+              
+              // Update the data container with the new data
+              // updateChart(value1,value2);
+              let payload = JSON.parse(message.payloadString)
+                  updateChart(payload.value1,payload.value2);
+                   
+              // pieChart.style.strokeDasharray ="50,100";
+            const pieChart = document.querySelector('.chart');
+            const percentage = document.querySelector('.percentage');
+              if(pieChart)pieChart.style.strokeDasharray = `${payload.value3}, 100`;
+              if(percentage)percentage.textContent = `${payload.value3} Bpm`;
+                console.log(payload)
+                
+          }
+
+          function reconnect() 
+          {
+              client.disconnect();
+              client.connect(
+              {
+              onSuccess: onConnect,
+              onFailure: onFailure,
+              useSSL: false,
+              });
+          };
+</script>
+</table>
+  </div>
+	</div>
+	</div>
+	<div class="col-div-4">
+	<div class="box-4">
+	<div class="content-box">
+		<p>Bpm </p>
+
+  </div>
+  <div class="chart-container">
+  <div class="chart"></div>
+  <div class="percentage">0</div>
+	<div class="clearfix"></div>
+  </div>
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script>
+
+  $(".nav").click(function(){
+  $("#mySidenav").css('width','70px');
+  $("#main").css('margin-left','70px');
+  $(".logo").css('visibility', 'hidden');
+  $(".logo").html("<span>HS</span>")
+  $(".logo span").css('visibility', 'visible');
+  $(".logo span").css('margin-left', '-10px');
+  $(".icon-a").css('visibility', 'hidden');
+  $(".logo-image").css('visibility', 'visible');
+  $(".logo-image").css('margin-left', '+=70px');
+  $(".icons").css('visibility', 'visible');
+  $(".icons").css('margin-left', '-8px');
+  $(".nav").css('display','none');
+  $(".nav2").css('display','block');
+  });
+
+  $(".nav2").click(function(){
+  $("#mySidenav").css('width','300px');
+  $("#main").css('margin-left','300px');
+  $(".logo").css('visibility', 'visible');
+  $(".logo").html("<span>Heart</span>Sensor");
+  $(".logo-image").css('margin-left', '-=70px');
+  $(".icon-a").css('visibility', 'visible');
+  $(".icons").css('visibility', 'visible');
+  $(".nav").css('display','block');
+  $(".nav2").css('display','none');
+  });
+
+</script>
+</body>
+</html>

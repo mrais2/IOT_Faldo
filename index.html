@@ -1,64 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Webpage Design</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-index.css">
 </head>
+
 <body>
-
     <div class="main">
-        <div class="navbar">
-            <div class="icon">
-                <h2 class="logo">PraRoz</h2>
-            </div>
+    <div class="navbar">
+    <div class="icon">
+        <h2 class="logo">Heart Rate</h2>
+        
+    <div class="menu">
+    <div class="content">
+        <h1>Heart Rate <br><span>Merupakan</span> <br> Frekuensi Detak jantung </h1>
+    <p class="par"> Jumlah detak jantung dalam satu menit yang menunjukkan seberapa cepat jantung memompa <br> darah ke seluruh tubuh, Pada orang dewasa denyut jantung normal berkisar antara 60 hingga <br> 100 denyut per menit saat dalam keadaan istirahat, namun,
+                    faktor-faktor seperti usia, kondisi<br>fisik, keadaan emosional, obat-obatan, dan kondisi medis tertentu dapat memengaruhi denyut <br> jantung seseorang.</p>
 
-            <div class="menu">
-                <ul>
-                    <li><a href="#">HOME</a></li>
-                    <li><a href="#">ABOUT</a></li>
-                    <li><a href="#">SERVICE</a></li>
-                    <li><a href="#">DESIGN</a></li>
-                    <li><a href="#">CONTACT</a></li>
-                </ul>
-            </div>
+    <div class="form">
+    <h2>Login Here</h2>
+    <form id="login-form">
 
-            <div class="search">
-                <input class="srch" type="search" name="" placeholder="Type To text">
-                <a href="#"> <button class="btn">Search</button></a>
-            </div>
+    <input type="text" id="username" name="username" placeholder="Enter username Here">
+    <div class="input-box"/div>
+    <input type="password" id="password" name="password" placeholder="Enter Password Here" maxlength="15">
+    <img src="icon/eye-close.png" id="eyeicon">
+    <input type="submit" class= "btnn" value="Login" onclick="validate()">
+    
+        <script>
+                        
+            let eyeicon = document.getElementById("eyeicon")
+            let password = document.getElementById("password")
 
-        </div> 
-        <div class="content">
-            <h1>Web Design & <br><span>Development</span> <br>Course</h1>
-            <p class="par">Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt neque 
-                 expedita atque eveniet <br> quis nesciunt. Quos nulla vero consequuntur, fugit nemo ad delectus 
-                <br> a quae totam ipsa illum minus laudantium?</p>
+                eyeicon.onclick = function()
+            {
+            if(password. type == "password")
+            {
+                password.type = "text";
+                eyeicon.src = " icon/eye-open.png"
+            }
+            else
+            {
+                password.type = "password"
+                eyeicon.src = " icon/eye-close.png"
+            }
+            }
+        </script>
+            </form>
+            <p id="message"></p>
+            
+        <script>
+            // Get the login form
+            const form = document.getElementById("login-form");
+            // // Add a listener for the form submission
+            form.addEventListener("submit", function(event) {
+            // // Prevent the default form submission
+            console.log("Submit")
+            event.preventDefault();
+            // // Get the username and password from the form
+            const username = form.username.value;
+            const password = form.password.value;         
+            //  // Send a POST request to the server to check the username and password
+            const xhr = new XMLHttpRequest();
+                xhr.open("POST", "http://192.168.0.41:5000/login");
+                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xhr.onload = function() {
+            // // Parse the JSON response from the server
+            const response = JSON.parse(xhr.responseText);
+            
+            if (xhr.status === 200) 
+                {
+            //  // If the login was successful, display a message and redirect to the dashboard page
+                document.getElementById("message").innerHTML = response.message;
+                                                            // Update the URL without username and password
+                window.history.pushState(null, null, "dashboard.html");
+            //  // Redirect to the dashboard page
+                window.location.href = "mainpage.html";
+                } 
+            else 
+                {
+            //   // If the login was unsuccessful, display an error message
+                document.getElementById("message").innerHTML = response.error;
+                }
+                };
+                xhr.send(JSON.stringify({ username: username, password: password }));
+                });
 
-                <button class="cn"><a href="#">JOIN US</a></button>
-
-                <div class="form">
-                    <h2>Login Here</h2>
-                    <input type="email" name="email" placeholder="Enter Email Here">
-                    <input type="password" name="" placeholder="Enter Password Here">
-                    <button class="btnn"><a href="#">Login</a></button>
-
-                    <p class="link">Don't have an account<br>
-                    <a href="#">Sign up </a> here</a></p>
-                    <p class="liw">Log in with</p>
-
-                    <div class="icons">
-                        <a href="#"><ion-icon name="logo-facebook"></ion-icon></a>
-                        <a href="#"><ion-icon name="logo-instagram"></ion-icon></a>
-                        <a href="#"><ion-icon name="logo-twitter"></ion-icon></a>
-                        <a href="#"><ion-icon name="logo-google"></ion-icon></a>
-                        <a href="#"><ion-icon name="logo-skype"></ion-icon></a>
-                    </div>
-
-                </div>
-                    </div>
-                </div>
-        </div>
-    </div>
-    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+        </script>
 </body>
 </html>
